@@ -1,0 +1,61 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: q1
+      id: q1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: q1
+        setup-command: rm -rf *.7z && wget --no-check-certificate -O test_ex02_data.7z
+          "https://docs.google.com/uc?export=download&id=1HpsocsgC8FT8kjWsNswGbhkGJgzlFomr"
+          && 7z x test_ex02_data.7z && rm -f *.py && wget --no-check-certificate -O
+          test_ex02_q1.7z "https://docs.google.com/uc?export=download&id=1r_8ov_tpjH2iLxDUV3qVvge1X-eKAu4R"
+          && 7z x test_ex02_q1.7z && pip install pytest pandas hypothesis importnb
+          ipykernel scipy matplotlib numpy
+        command: env GRADING=1 pytest
+        timeout: 10
+        max-score: 40
+    - name: q2
+      id: q2
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: q2
+        setup-command: rm -rf *.7z && rm -f *.py && wget --no-check-certificate -O
+          test_ex02_q2.7z "https://docs.google.com/uc?export=download&id=1vcujzAuOfjLSvQAtDV-NYC7mwXtQMgO3"
+          && 7z x test_ex02_q2.7z && pip install pytest pandas hypothesis importnb
+          ipykernel scipy matplotlib numpy
+        command: env GRADING=1 pytest
+        timeout: 10
+        max-score: 40
+    - name: q3
+      id: q3
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: q3
+        setup-command: rm -rf *.7z && rm -f *.py && wget --no-check-certificate -O
+          test_ex02_q3.7z "https://docs.google.com/uc?export=download&id=1oUM8NB2WAwTT2bW1xegKqaddCMHsxyhh"
+          && 7z x test_ex02_q3.7z && pip install pytest pandas hypothesis importnb
+          ipykernel scipy matplotlib numpy
+        command: env GRADING=1 pytest
+        timeout: 10
+        max-score: 20
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        Q1_RESULTS: "${{steps.q1.outputs.result}}"
+        Q2_RESULTS: "${{steps.q2.outputs.result}}"
+        Q3_RESULTS: "${{steps.q3.outputs.result}}"
+      with:
+        runners: q1,q2,q3
